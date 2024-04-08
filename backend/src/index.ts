@@ -4,28 +4,23 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-dotenv.config();
-
 import router from './router';
+
+dotenv.config();
 
 
 const app = express();
 
-const corsOptions = {
-    origin: 'https://nft-mint-bay.vercel.app/',
-    optionsSuccessStatus: 200 
-};
-
-app.use(cors(corsOptions));
+app.use(cors({origin: 'https://nft-mint-bay.vercel.app', optionsSuccessStatus: 200}));
 app.use(cookieParser());
 // app.use(bodyparser.json());
 app.use(express.json());
 
-const server = http.createServer(app);
-
-server.listen(8080, () => {
-    console.log('Server is running on port 8080');
-});
+//skipping this to deploy to vercel
+// const server = http.createServer(app);
+// server.listen(8080, () => {
+//     console.log('Server is running on port 8080');
+// });
 
 mongoose.Promise = Promise;
 mongoose.connect(process.env.MONGO_URL || "")
@@ -45,4 +40,6 @@ db.once('open', function() {
     //     console.error('Error connecting to MongoDB:', err);
     // });
 
-    app.use('/', router());
+app.use('/', router());
+
+export default app;

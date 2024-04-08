@@ -11,7 +11,12 @@ import router from './router';
 
 const app = express();
 
-app.use(cors());
+const corsOptions = {
+    origin: 'https://nft-mint-bay.vercel.app/',
+    optionsSuccessStatus: 200 
+};
+
+app.use(cors(corsOptions));
 app.use(cookieParser());
 // app.use(bodyparser.json());
 app.use(express.json());

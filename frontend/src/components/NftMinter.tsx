@@ -61,7 +61,7 @@ export const NftMinter: FC = () => {
             setMintSignature(signature);
     
             // Send the mint address and signature to the backend
-            fetch("/minter", { // Change the route to match your backend route
+            fetch("http://localhost:8080/minter", { // Change the route to match your backend route
                 method: "POST",
                 headers: {
                     'Content-Type': 'application/json'

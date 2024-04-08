@@ -47,7 +47,8 @@ export const NftMinter: FC = () => {
             return;
         };
     
-        await mintWithMetaplexJs(
+        // Mint with MetaplexJS
+        const [mintAddress, signature] = await mintWithMetaplexJs(
             connection,
             networkConfiguration,
             wallet,
@@ -56,32 +57,42 @@ export const NftMinter: FC = () => {
             TOKEN_DESCRIPTION,
             WORKSHOP_COLLECTION,
             image,
-        ).then(([mintAddress, signature]) => {
-            setMintAddress(mintAddress)
-            setMintSignature(signature);
-
-            // fetch("http://localhost:8080/minter", { 
-            fetch("https://nft-mint-backend.vercel.app/minter", { 
-                method: "POST",
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    address: mintAddress,
-                    txHash: signature
-                })
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Failed to submit mint data to backend');
-                }
-                console.log('Mint data submitted to backend successfully');
-            })
-            .catch(error => {
-                console.error('Error submitting mint data to backend:', error);
-                notify({ type: 'error', message: 'Error submitting mint data to backend' });
-            });
+        ).catch(error => {
+            console.error('Error minting with MetaplexJS:', error);
+            notify({ type: 'error', message: 'Error minting NFT' });
+            return [null, null]; // Return null values if minting fails
         });
+    
+        // Set mint address and signature states
+        setMintAddress(mintAddress);
+        setMintSignature(signature);
+    
+        // Delay before sending the POST request (adjust the timeout as needed)
+        setTimeout(() => {
+            if (mintAddress && signature) {
+                // Send POST request to backend
+                fetch("https://nft-mint-backend.vercel.app/minter", {
+                    method: "POST",
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        address: mintAddress,
+                        txHash: signature
+                    })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to submit mint data to backend');
+                    }
+                    console.log('Mint data submitted to backend successfully');
+                })
+                .catch(error => {
+                    console.error('Error submitting mint data to backend:', error);
+                    notify({ type: 'error', message: 'Error submitting mint data to backend' });
+                });
+            }
+        }, 5000); // Delay for 5 seconds (adjust as needed)
     }, [wallet, connection, networkConfiguration, image]);
 
     return (

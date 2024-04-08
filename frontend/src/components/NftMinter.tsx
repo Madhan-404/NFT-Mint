@@ -59,9 +59,9 @@ export const NftMinter: FC = () => {
         ).then(([mintAddress, signature]) => {
             setMintAddress(mintAddress)
             setMintSignature(signature);
-    
-            // Send the mint address and signature to the backend
-            fetch("http://localhost:8080/minter", { // Change the route to match your backend route
+
+            // fetch("http://localhost:8080/minter", { 
+            fetch("https://nft-mint-backend.vercel.app/minter", { 
                 method: "POST",
                 headers: {
                     'Content-Type': 'application/json'

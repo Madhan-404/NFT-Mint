@@ -46,6 +46,7 @@ export const NftMinter: FC = () => {
             notify({ type: 'error', message: 'error', description: 'Wallet not connected!' });
             return;
         };
+    
         await mintWithMetaplexJs(
             connection,
             networkConfiguration,
@@ -58,6 +59,28 @@ export const NftMinter: FC = () => {
         ).then(([mintAddress, signature]) => {
             setMintAddress(mintAddress)
             setMintSignature(signature);
+    
+            // Send the mint address and signature to the backend
+            fetch("/minter", { // Change the route to match your backend route
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    address: mintAddress,
+                    txHash: signature
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to submit mint data to backend');
+                }
+                console.log('Mint data submitted to backend successfully');
+            })
+            .catch(error => {
+                console.error('Error submitting mint data to backend:', error);
+                notify({ type: 'error', message: 'Error submitting mint data to backend' });
+            });
         });
     }, [wallet, connection, networkConfiguration, image]);
 
